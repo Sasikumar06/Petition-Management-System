@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Submit Petition{% endblock %}
+{% block content %}
+<h1 class="mb-4">Submit New Petition</h1>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">Petition Form</div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Petition Title</label>
+                        <input type="text" class="form-control" id="title" name="title" 
+                               value="{{ form_data.title | default('', true) }}" required maxlength="100">
+                        <small class="form-text text-muted">5-100 characters</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="content_text" class="form-label">Petition Content</label>
+                        <textarea class="form-control" id="content_text" name="content_text" rows="8"
+                                  maxlength="5000">{{ form_data.content_text | default('', true) }}</textarea>
+                        <small class="form-text text-muted">10-5000 characters if provided, or upload a file</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Upload Document (Optional)</label>
+                        <input type="file" class="form-control" id="file" name="file" 
+                               accept=".pdf,.txt,.jpg,.jpeg,.png">
+                        <small class="form-text text-muted">Supported formats: PDF, TXT, JPG, PNG</small>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="is_public" name="is_public" 
+                               {% if form_data.is_public | default(false, true) %}checked{% endif %}>
+                        <label class="form-check-label" for="is_public">Make petition public</label>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Submit Petition</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">Guidelines</div>
+            <div class="card-body">
+                <ul>
+                    <li>Be clear and specific about your petition</li>
+                    <li>Provide all relevant details</li>
+                    <li>Our AI will automatically categorize your petition</li>
+                    <li>Upload supporting documents if needed</li>
+                    <li>You can submit petitions in Tamil or English</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">What happens next?</div>
+            <div class="card-body">
+                <ol>
+                    <li>Your petition will be analyzed and assigned to the relevant department</li>
+                    <li>Officials will review your petition</li>
+                    <li>You'll receive updates on the status</li>
+                    <li>Officials will process your petition and provide a resolution</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

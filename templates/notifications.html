@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Notifications</h1>
+
+<div class="card">
+    <div class="card-body">
+        {% if notifications %}
+            <div class="list-group">
+                {% for notification in notifications %}
+                <a href="{{ url_for('view_petition', petition_id=notification.petition_id) }}" 
+                   class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="mb-1">{{ notification.message }}</h6>
+                        <small>{{ notification.timestamp|format_date }}</small>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">No notifications found.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

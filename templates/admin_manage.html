@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Management{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Admin Management</h1>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Analytics</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="petitionChart" height="200"></canvas>
+                
+                <script>
+                    const chartData = [
+                        {% for item in monthly_counts %}
+                        {
+                            month: "{{ item.month }}",
+                            count: {{ item.count }}
+                        }{% if not loop.last %},{% endif %}
+                        {% endfor %}
+                    ];
+                </script>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Department Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Petitions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dept in department_counts %}
+                            <tr>
+                                <td>{{ dept.name }}</td>
+                                <td>{{ dept.count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Add Department</div>
+            <div class="card-body">
+                <form method="post">
+                    <input type="hidden" name="action" value="add_department">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Department Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="description" name="description">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Department</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Add Official</div>
+            <div class="card-body">
+                <form method="post">
+                    <input type="hidden" name="action" value="add_user">
+                    <input type="hidden" name="role" value="official">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="user_name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="user_name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="department" class="form-label">Department</label>
+                        <select class="form-select" id="department" name="department" required>
+                            {% for dept in departments %}
+                                <option value="{{ dept.name }}">{{ dept.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Official</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Department Officials</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for official in officials %}
+                    <tr>
+                        <td>{{ official.name }}</td>
+                        <td>{{ official.email }}</td>
+                        <td>{{ official.department }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Send Reminders</h5>
+    </div>
+    <div class="card-body">
+        <p>Send email reminders to officials for petitions pending for more than 3 days.</p>
+        <a href="{{ url_for('send_reminders') }}" class="btn btn-primary">Send Reminders</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chartCanvas = document.getElementById('petitionChart');
+        if (chartCanvas && typeof chartData !== 'undefined') {
+            const ctx = chartCanvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.map(item => item.month),
+                    datasets: [{
+                        label: 'Petitions per Month',
+                        data: chartData.map(item => item.count),
+                        backgroundColor: 'rgba(58, 134, 255, 0.2)',
+                        borderColor: 'rgba(58, 134, 255, 1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Petitions'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        } else {
+            console.error('Chart canvas or data not found');
+        }
+    });
+</script>
+{% endblock %}
